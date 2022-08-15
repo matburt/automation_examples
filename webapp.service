@@ -1,0 +1,13 @@
+[Unit]
+Description=webapp
+
+[Service]
+Type=simple
+Restart=always
+User=root
+Group=root
+WorkingDirectory=/opt/webapp/
+ExecStart=/bin/node bin/www
+
+[Install]
+WantedBy=multi-user.target
