@@ -1,13 +1,13 @@
 ---
 - name: "Deploy Web Application Stack"
   hosts: all
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
-    - name: "Install Required Packages"
+    - name: "Install nginx and nodejs 12 Packages"
       ansible.builtin.dnf:
         name: "nginx, @nodejs:12"
-        update_cache: yes
+        update_cache: true
         state: present
     - name: "Copy over webapp"
       ansible.builtin.copy:
@@ -15,7 +15,7 @@
         dest: "/opt"
         mode: "0755"
     - name: "Install NodeJS Dependencies"
-      ansible.builtin.npm:
+      community.general.npm:
         path: "/opt/webapp"
         state: present
     - name: "Install nginx configuration"
@@ -26,15 +26,15 @@
         group: "root"
         mode: "0644"
     - name: "Set selinux http policy"
-      ansible.builtin.seboolean:
+      ansible.posix.seboolean:
         name: "httpd_can_network_connect"
-        state: yes
-        persistent: yes
+        state: false
+        persistent: true
     - name: "Start and Enable nginx"
       ansible.builtin.systemd:
         name: "nginx"
         state: restarted
-        enabled: yes
+        enabled: true
     - name: "Deploy webapp service unit"
       ansible.builtin.copy:
         src: "webapp.service"
@@ -53,5 +53,5 @@
       ansible.builtin.systemd:
         name: "webapp"
         state: restarted
-        enabled: yes
-        daemon_reload: yes
+        enabled: true
+        daemon_reload: true
